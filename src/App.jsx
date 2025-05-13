@@ -1,23 +1,25 @@
 import "./App.css";
-import Profile from "./components/Profile/Profile";
-import userData from "./userData.json";
-import FriendList from "./components/FriendList/FriendList";
-import friends from "./friends.json";
-import transactions from "./transactions.json";
-import TransactionHistory from "./components/TransactionHistory/TransactionHistory";
+import SearchBar from "./components/SearchBar/SearchBar";
+import Loader from "./components/Loader/Loader";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import ImageGallery from "./components/ImageGallery/ImageGallery";
+import { useState } from "react";
+import searchRequest from "./api";
 
 export default function App() {
+  const [imageCards, setImageCards] = useState([]);
+
+  const handleSearch = async (newTopic) => {
+    const results = await searchRequest(newTopic);
+    setImageCards(results);
+  };
+
   return (
     <>
-      <Profile
-        name={userData.username}
-        tag={userData.tag}
-        location={userData.location}
-        image={userData.avatar}
-        stats={userData.stats}
-      />
-      <FriendList friends={friends} />
-      <TransactionHistory items={transactions} />
+      <SearchBar onSearch={handleSearch} />
+      <Loader />
+      {imageCards.length > 0 && <ImageGallery images={imageCards} />}
+      <ErrorMessage />
     </>
   );
 }
