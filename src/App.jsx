@@ -6,6 +6,7 @@ import ImageGallery from "./components/ImageGallery/ImageGallery";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
 import { useState, useEffect, useRef } from "react";
 import searchRequest from "./api";
+import ImageModal from "./components/ImageModal/ImageModal";
 
 export default function App() {
   const [imageCards, setImageCards] = useState([]);
@@ -16,6 +17,18 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [totalPages, setTotalPages] = useState(1);
   const galleryRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+    setIsModalOpen(false);
+  };
 
   const loadImages = async (searchQuery, pageNumber) => {
     if (searchQuery.trim() === "") return;
@@ -82,12 +95,17 @@ export default function App() {
       {imageCards.length > 0 && (
         <>
           <div ref={galleryRef}>
-            <ImageGallery images={imageCards} />
+            <ImageGallery images={imageCards} onImageClick={openModal} />
           </div>
           {isLoading && <Loader />}
           {shouldShowLoadMore && <LoadMoreBtn onClick={handleLoadMore} />}
         </>
       )}
+      <ImageModal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        image={selectedImage}
+      />
       {imageCards.length === 0 && isLoading && <Loader />}
     </>
   );
